@@ -170,5 +170,4 @@
 
   MaxWidth和MaxHeight：元素的最大尺寸。
 
-  Width和Height：显式地设置元素的尺寸。
 
