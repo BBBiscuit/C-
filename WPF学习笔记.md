@@ -130,7 +130,8 @@
 
   WPF的布局控件都继承于Sysrem.Windows.Controls.Panel类。
 
-  Background
+  * Background 面板背景色的画刷。如果想接受鼠标事件，必须将该属性设置为非空值（如果想接受鼠标事件，又不希望显示一个固定颜色的背景，只需要将背景色设置为透明）
+  * Children 面板中存储的条目集合。第一级对象，条目自身可以包含更多的条目。
 
   ### Canvas布局控件
 
