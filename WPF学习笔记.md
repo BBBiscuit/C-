@@ -135,11 +135,13 @@
 
   ### Canvas布局控件
 
-* Canvas是最轻量级的布局容器，不会自动调整内部元素的排列和大小。元素默认显示在画布的左上方，主要用来画图。默认不会自动剪裁超出自身范围的内容（ClipToBounds属性的默认值是false）。
+* Canvas是最轻量级的布局容器，使用固定的坐标绝对定位元素。不会自动调整内部元素的排列和大小。元素默认显示在画布的左上方，主要用来画图。默认不会自动剪裁超出自身范围的内容（ClipToBounds属性的默认值是false）。
 
   ### StackPanel
 
-* StackPanel就是将子元素按照堆栈形式一一排列。可以通过设置**StackPanel的Orientation属性设置两种排列方式：横排（Horizontal，默认值)和竖排（Vertical）。**纵向的StackPanel每个元素默认宽度与面板一样宽，反之横向是高度和面板一样高。如果包含的元素超过了面板控件，它会被截断多出的内容。
+* StackPanel就是将子元素按照堆栈形式一一排列。通常用于复杂窗口中的一些小区域。
+
+  可以通过设置**StackPanel的Orientation属性设置两种排列方式：横排（Horizontal，默认值)和竖排（Vertical）。**纵向的StackPanel每个元素默认宽度与面板一样宽，反之横向是高度和面板一样高。如果包含的元素超过了面板控件，它会被截断多出的内容。
 
   ```C#
   <Window x:Class="WpfApplication4.MainWindow"
@@ -149,10 +151,11 @@
       <Grid>
           <StackPanel Margin="10,10,10,10" Background="Azure" Orientation="Horizontal"> 
               <Label HorizontalAlignment="Center">A Button Stack</Label>
-              <Button Content="Button1" />
+              <Button Content="Button1" HorizontalAlignment="Right"/>//按钮水平方向位置
               <Button>Button 2</Button>
               <Button>Button 3</Button>
               <Button Content="Button 4"></Button>
+              //如果想重新排列元素，可以拖动元素到新位置
           </StackPanel>
       </Grid>
   </Window>
@@ -171,4 +174,9 @@
   MaxWidth和MaxHeight：元素的最大尺寸。
 
   Width和Height：显式地设置元素的尺寸。
+
+  **注意：**以上布局属性可以应用于许多布局面板的通用属性，因此这些属性被定义为FrameworkElement基类的一部分。除此之外，不同的布局容器可以为他们的子元素提供**附加属性**。例如，Grid对象的所有子元素可以获得Row和Column属性。
+
+  StackPanel面板也有自己的HorizontalAlignment和VerticalAlignment属性，默认为Stretch，故StackPanel面板充满容器。如果使用不同设置，尺寸将容纳最宽的控件。
+
 
