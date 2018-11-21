@@ -179,4 +179,65 @@
 
   StackPanel面板也有自己的HorizontalAlignment和VerticalAlignment属性，默认为Stretch，故StackPanel面板充满容器。如果使用不同设置，尺寸将容纳最宽的控件。
 
+* 边距
 
+  设置边距时可以令所有边设置为相同宽度。
+
+  ```C#
+  <Button Margin="5">Button 3</Button>
+  ```
+
+  也可以令控件的每个边以**左、上、右、下**的顺序设置不同的边距
+
+  ```
+  <Button Margin="5,10,5,10">Button 3</Button>
+  ```
+
+  代码中边距使用Thickness结构设置：
+
+  ```C#
+  cmd.Margin=new Thickness(5);
+  ```
+
+  **注意：**因为需要考虑相邻控件边距设置的相互影响，应该避免为不同的边设置不同的值。例如，在StackPanel中，按钮和面板本身使用相同的边距是比较合适的。
+
+* 尺寸
+
+  Width和Height：显式地设置元素的尺寸，但是如果有必要，应该使用**最大尺寸和最小尺寸**，把控件限制在正确的范围内。在一个良好的布局设计中，显式地设置尺寸是不需要的。
+
+  ```C#
+  <StackPanel Margin="3"> 
+       <Label HorizontalAlignment="Center">A Button Stack</Label>
+       <Button Margin="3" MaxWidth="200" MinWidth="100">Button 2</Button>
+       <Button Margin="3" MaxWidth="200" MinWidth="100">Button 3</Button>
+   </StackPanel>
+  ```
+
+  可以通过**ActualHeight属性和ActualWidth属性**得到用于渲染元素的**实际尺寸**，当窗口大小发生变化或其中的内容改变的时候，这些值可能会改变。
+
+  **顶级窗口的尺寸：**为了使窗口能够自动改变大小，需要删除Height和Width属性，并将Window.SizeToContent属性设置为WidthAndHeight，窗口就会调整自身的尺寸，从而足以容纳所包含的内容。还可以通过将SizeToContent属性设置为Width或Height，可以让窗口在一个方向上改变自身尺寸。
+
+* Border控件
+
+  Border类只能包含一段嵌套内容（通常是布局面板），并且为其添加背景或者边框。
+
+  ```c#
+          <Border Margin="5"
+                  Padding="5"
+                  //边框和内部的内容之间添加空间
+                  Background="LightYellow"
+                  //使用Brush设置边框在所有内容后面的背景，固定颜色或者更特殊的背景
+                  BorderBrush="SteelBlue"
+                  BorderThickness="3,5,3,5"
+                  //设置边框颜色以及宽度，为了显示边框必须设置这两个属性
+                  CornerRadius="9"
+                  //使边框具有优美的圆角
+                  VerticalAlignment="Top">
+              <StackPanel>
+                 <Button Margin="3" Content="Button 4" />
+                 <Button Content="Button 2" />        
+              </StackPanel>
+          </Border>
+  ```
+
+  ### WrapPanel面板和DockPanel面板
