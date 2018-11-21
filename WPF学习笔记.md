@@ -177,7 +177,7 @@
 
   **注意：**以上布局属性可以应用于许多布局面板的通用属性，因此这些属性被定义为FrameworkElement基类的一部分。除此之外，不同的布局容器可以为他们的子元素提供**附加属性**。例如，Grid对象的所有子元素可以获得Row和Column属性。
 
-  StackPanel面板也有自己的HorizontalAlignment和VerticalAlignment属性，默认为Stretch，故StackPanel面板充满容器。如果使用不同设置，尺寸将容纳最宽的控件。
+  **StackPanel面板也有自己的HorizontalAlignment和VerticalAlignment属性，默认为Stretch，故StackPanel面板充满容器。如果使用不同设置，尺寸将容纳最宽的控件。**
 
 * 边距
 
@@ -219,7 +219,7 @@
 
 * Border控件
 
-  Border类只能包含一段嵌套内容（通常是布局面板），并且为其添加背景或者边框。
+  Border类只能包含**一段**嵌套内容（通常是布局面板），并且为其添加背景或者边框。
 
   ```c#
           <Border Margin="5"
@@ -241,3 +241,56 @@
   ```
 
   ### WrapPanel面板和DockPanel面板
+
+* WrapPanel面板
+
+  在可能的空间中，一次以一行或者一列的方式布置控件。默认WrapPanel.Orientation属性设置为Horizontal。控件从左向右排列，然后再下一行中排列。
+
+  WrapPanel面板水平地创建了一系列假象的行，每一行的高度为所包含最高元素的高度。可以通过VerticalAlignment属性设置进行对齐。
+
+  提示：实际应用的时候主要用来控制一小部分布局细节，比如以类似工具栏空间的方式将所有的按钮保持在一起。
+
+  ```C#
+          <WrapPanel Margin="3,3,92,144">
+              <Button VerticalAlignment="Top">Top Button</Button>
+              <Button MinHeight="60">Tall Button</Button>
+              <Button VerticalAlignment="Bottom">Bottom Button</Button>
+              <Button>Stretch Button</Button>
+              <Button VerticalAlignment="Center">Centered Button</Button>
+          </WrapPanel>
+  ```
+
+* DockPanel面板
+
+  如果一个按钮停靠在DockPanel面板顶部，该按钮将会被拉伸至面板的整个宽度，但是根据内容和MinHeight属性为其设置所需的**高度**。显然停靠顺序也很重要。
+
+  ```C#
+         //通过Dock的附加属性设置子元素停靠的边
+  		<DockPanel LastChildFill="True">//LastChildFill属性令最后一个元素占满剩余空间
+              <Button DockPanel.Dock="Top">Top Button</Button>
+              <Button DockPanel.Dock="Bottom">Bottom Button</Button>
+              <Button DockPanel.Dock="Left">Left Button</Button>
+              <Button DockPanel.Dock="Right">Right Button</Button>
+              <Button >Remaining Space</Button>
+          </DockPanel>
+  ```
+
+  嵌套布局容器
+
+  ```C#
+          <DockPanel LastChildFill="True">
+          //StackPanel面板放置两个Button，并通过对面板属性 HorizontalAlignment赋值，令其水平放置，并处于右边。由于开始只在DockPanel中声明了一个StackPanel元素，他将占满整个DockPanel面板，之后声明TextBox后，StackPanel将会根据按钮元素内容调整大小
+              <StackPanel DockPanel.Dock="Bottom"
+                          Orientation="Horizontal"
+                          HorizontalAlignment="Right">
+                  <Button Margin="10,10,2,10" Padding="3">OK</Button>
+                  <Button Margin="2,10,10,10" Padding="3">Cancel</Button>
+              </StackPanel>
+              //TextBox框将处于DockPanel面板的上方，并充满剩余空间
+              <TextBox DockPanel.Dock="Top"
+                       Margin="10">This is a test.</TextBox>
+          </DockPanel>Grid面板
+  ```
+
+  ### Grid面板
+
