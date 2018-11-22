@@ -150,6 +150,36 @@
   </Canvas>
   ```
 
+* InkCanvas元素
+
+  InkCanvas定义了四个附加属性（ToP/left/Bottom/Right），可以将这四个附加属性应用于子元素，异根据坐标进行定位。
+
+  InkCanvas元素的主要目的是用于接收手写笔输入，同时也可以使用鼠标进行工作。
+
+  ```C#
+      <Grid >
+          <InkCanvas Name="inkCanvas" Background="LightYellow" EditingMode="Ink">
+              <Button InkCanvas.Top="10" InkCanvas.Left="10" Width="20"                                 Height="30"></Button>
+          </InkCanvas>
+      </Grid>
+  ```
+
+  InkCanvas.EditingMode属性值为一个枚举类型。
+
+  Ink：默认模式，鼠标或者手写笔绘图
+
+  GestureOnly：不允许绘制笔画批注，但是会关注预先定义的特定姿势。能够识别的姿势的完整列表由System.Windows.Ink.ApplicationGesture枚举给出。
+
+  InkAndGesture
+
+  EraseByStroke:单击画笔，擦除笔画。
+
+  EraseByPoint：擦除点击部分。
+
+  Select：允许用户选择保存在Children集合中的元素，可以通过单击或者拖动套索包含该元素。一旦选择了一个元素，就可以移动该元素，改变其尺寸或者删除。
+
+  None：忽略鼠标和手写笔输入。
+
   ### StackPanel面板
 
 * StackPanel就是将子元素按照堆栈形式一一排列。通常用于复杂窗口中的一些小区域。
@@ -413,3 +443,53 @@
   Grid面板中设置两列的ShareSizeGroup属性即可。
 
   例：<ColumnDenifition Width="Auto"  ShareSizeGroup="TextLable”/>
+
+### 布局示例
+
+```C#
+    <Grid Margin="3,3,10,3" ShowGridLines="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" ></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="Auto" ></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        //重点注意以下控件的放置位置属性
+        <Label Margin="3" Grid.Row="0" Grid.Column="0"
+               VerticalAlignment="Center">Home:</Label>
+        <TextBox Margin="3" Grid.Row="0" Grid.Column="1" Height="Auto" 
+                 VerticalAlignment="Center">c:\</TextBox>
+        <Button Margin="3" Grid.Row="0" Grid.Column="2" 
+                Padding="2">Browse</Button>
+        //以下三组控件放置基本重复上面
+        <Label Margin="3" Grid.Row="1" Grid.Column="0"                                                VerticalAlignment="Center">Network:</Label>
+        <TextBox Margin="3" Grid.Row="1" Grid.Column="1" Height="Auto"                                  VerticalAlignment="Center">e:\Shared</TextBox>
+        <Button Margin="3" Grid.Row="1" Grid.Column="2" Padding="2">Browse</Button>
+
+        <Label Margin="3" Grid.Row="2" Grid.Column="0"
+               VerticalAlignment="Center">Web:</Label>
+        <TextBox Margin="3" Grid.Row="2" Grid.Column="1" Height="Auto"                                  VerticalAlignment="Center">c:\</TextBox>
+        <Button Margin="3" Grid.Row="2" Grid.Column="2" Padding="2">Browse</Button>
+        
+        <Label Margin="3" Grid.Row="3" Grid.Column="0"                                                VerticalAlignment="Center">Secondary:</Label>
+        <TextBox Margin="3" Grid.Row="3" Grid.Column="1" Height="Auto"                                  VerticalAlignment="Center">c:\</TextBox>
+        <Button Margin="3" Grid.Row="3" Grid.Column="2" 
+                Padding="2">Browse</Button>
+    </Grid>
+```
+
+注意：放置到WPF窗口中的任何内容都支持**Visibility**属性，其值为一个枚举类型。
+
+​           Visible ：元素在窗口正常显示。
+
+​	   Collapsed：元素不显示，也不占用任何空间。
+
+​           Hidden：元素不显示，但是仍然为它保留空间。会在元素可能显示的地方保留空白空间。
+
+​           **如果需要隐藏和显示元素，而且又不希望改变窗口布局和窗口中剩余元素的相对位置，使用此设置。**
+
