@@ -133,11 +133,24 @@
   * Background 面板背景色的画刷。如果想接受鼠标事件，必须将该属性设置为非空值（如果想接受鼠标事件，又不希望显示一个固定颜色的背景，只需要将背景色设置为透明）
   * Children 面板中存储的条目集合。第一级对象，条目自身可以包含更多的条目。
 
-  ### Canvas布局控件
+  ### Canvas面板
 
-* Canvas是最轻量级的布局容器，使用固定的坐标绝对定位元素。不会自动调整内部元素的排列和大小。元素默认显示在画布的左上方，主要用来画图。默认不会自动剪裁超出自身范围的内容（ClipToBounds属性的默认值是false）。
+* Canvas是最轻量级的布局容器，使用固定的坐标绝对定位元素。不会自动调整内部元素的排列和大小。元素默认显示在画布的左上方，主要用来**画图**。默认不会自动剪裁超出自身范围的内容（ClipToBounds属性的默认值是false）。
 
-  ### StackPanel
+* Z顺序
+
+  如果在Canvas面板中有多个相互重叠的元素，可以通过设置Canvas.ZIndex附加属性来控制他们的层叠方式。通常所有元素的ZIndex值为0，如果具有相同的Z值，则根据它们在Canvas.Children集合中的顺序进行显示，后声明的元素在先声明的元素上面。Z值大的元素在Z值小的元素上面。
+
+  ```C#
+  <Canvas>
+  	<Button Canvas.Left="60" Canvas.Top="80" Canvas.ZIndex="1" 
+  	        Width="50" Height="50">Button 1</Button>
+  	 <Button Canvas.Left="70" Canvas.Top="120"
+  	        Width="100" Height="50">Button 2</Button>
+  </Canvas>
+  ```
+
+  ### StackPanel面板
 
 * StackPanel就是将子元素按照堆栈形式一一排列。通常用于复杂窗口中的一些小区域。
 
@@ -294,3 +307,109 @@
 
   ### Grid面板
 
+* 三种设置尺寸的方式
+
+  绝对设置尺寸方式`<ColumnDefinition Width="100"/>
+
+  自动设置尺寸方式`<ColumnDefinition Width="Auto"/>
+
+  按比例设置尺寸方式`<ColumnDefinition Width="*"/>
+
+  ​                                    `<ColumnDefinition Width="2*"/>
+
+* ```C#
+      <Grid ShowGridLines="True">//ShowGridLines可以显示每行每列的分割线
+          <Grid.RowDefinitions>
+              <RowDefinition Height="*"></RowDefinition>
+              <RowDefinition Height="Auto"></RowDefinition>
+          </Grid.RowDefinitions>
+          <TextBox Margin="10"
+                   Grid.Row="0">This is a test</TextBox>
+          <StackPanel Grid.Row="1"
+                      Orientation="Horizontal"
+                      HorizontalAlignment="Right">
+              <Button Margin="10,10,2,10" 
+          			Padding="3">OK</Button>
+              <Button Margin="2,10,10,10"
+                      Padding="3">Cancel</Button>
+          </StackPanel>
+      </Grid>
+  ```
+
+* 布局舍入
+
+  如果Grid面板的宽度为175像素，就不能很清晰的分割成两列，并且每列为87.5像素。可以通过布局容器的UseLayoutRounding属性设置为true解决此问题。
+
+* 跨越行列
+
+  ```C#
+      <Grid ShowGridLines="True">
+          <Grid.RowDefinitions>//将面板分为两行三列
+              <RowDefinition Height="*"></RowDefinition>
+              <RowDefinition Height="Auto"></RowDefinition>
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"></ColumnDefinition>
+              <ColumnDefinition Width="Auto"></ColumnDefinition>
+              <ColumnDefinition Width="Auto"></ColumnDefinition>
+          </Grid.ColumnDefinitions>
+          <TextBox Margin="10"
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="3">This is a test</TextBox>//TextBox占三列
+              <Button Margin="10,10,2,10" 
+                      Padding="3"
+                      Grid.Row="1"
+                      Grid.Column="1">OK</Button>
+              <Button Margin="2,10,10,10"
+                      Padding="3"
+                      Grid.Row="1"
+                      Grid.Column="2">Cancel</Button>
+      </Grid>
+  ```
+
+  注意：这种**占多行多列的布局并不好**，列宽由位于窗口底部的两个按钮的尺寸决定，继续添加新的内容变得困难。所以，对于一次性的布局任务，例如安排一组按钮，可以使用更小的布局容器。
+
+* 分割窗口
+
+  分隔条由GridSplitter类表示，是Grid面板的一个特性。
+
+  使用分隔条的指导原则：
+
+  * GridSplitter必须放在Grid单元格中，可以和已经存在的内容一起放到一个单元格，通过调整边距使它们不重叠。更好的方法是预留一行或者一列用于专门放置GridSplitter对象，并把预留的行或者列的Heigh属性或者Width属性的值设置为Auto。
+
+  * GridSplitter总是改变整行或者整列的尺寸，而不是单个单元格，所以需要拉伸GridSplitter对象使其穿越整行或者整列，为此可以使用RowSpan或者ColumnSpan属性。
+
+  * GridSplitter对象尺寸很小，需要设置尺寸。竖直分隔条需要将VerticalAlignment属性设置为Stretch，并且将其Width设置为一个固定的值。水平分隔条，将HorizontalAlignment属性设置为Stretch，Height设置为一个固定值。
+
+  * 水平分隔条，需要将VerticalAlignment属性设置为Center，竖直分隔条需要将HorizontalAlignment属性设置为Center。
+
+    ```C#
+        <Grid ShowGridLines="True">
+            <Grid.RowDefinitions>
+                <RowDefinition ></RowDefinition>
+                <RowDefinition ></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="100"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                //放置分隔条的列设置为Auto宽度
+                <ColumnDefinition MinWidth="50"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+                <Button Margin="3" Grid.Row="0"  Grid.Column="0">Left</Button>
+                <Button Margin="3" Grid.Row="0" Grid.Column="2">Right</Button>
+                <Button Margin="3" Grid.Row="1" Grid.Column="0">Left</Button>
+                <Button Margin="3" Grid.Row="1" Grid.Column="2">Right</Button>
+            <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" //分隔条占两列
+                          Width="3" VerticalAlignment="Stretch" //设置宽度		                                   HorizontalAlignment="Center" 
+                          ShowsPreview="False"></GridSplitter>
+         //ShowPreview属性为False的时候，只要拖动分隔条就会立即改变尺寸
+         //如果设置为True，拖动分隔条就会看到一个灰色的阴影随着鼠标移动，释放鼠标之后才会改变尺寸
+        </Grid>
+    ```
+
+* 共享尺寸组
+
+  Grid面板中设置两列的ShareSizeGroup属性即可。
+
+  例：<ColumnDenifition Width="Auto"  ShareSizeGroup="TextLable”/>
