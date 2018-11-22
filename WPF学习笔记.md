@@ -1,3 +1,5 @@
+[TOC]
+
 # WPF学习笔记
 
 ## WPF概述
@@ -10,7 +12,7 @@
 
   WPF现状：主要是用于开发Windows桌面应用
 
-# XAML
+## XAML
 
 ### XAML简介
 
@@ -32,9 +34,125 @@
 
 * 命名元素
 
-  \<Grid x:Name="grid1"\>或者通过Properties窗口进行设置。
+  \<Grid Name="grid1"\>或者通过Properties窗口进行设置。
 
   提示：WPF中并不要求每个空间都有名称。但如果通过VS设计器表面上拖放元素来创建窗口，将为每个元素自动生成一个名称。
+
+### XAML中的属性和事件
+
+XAML解析器需要将字符串值转换成非字符串属性。
+
+#### 复杂属性
+
+```C#
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush>
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.00" Color="Red" />
+                    <GradientStop Offset="0.50" Color="Indigo" />
+                    <GradientStop Offset="1.00" Color="Violet" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+        </Grid.Background>
+    </Grid>
+    //产生一个渐变的背景色
+```
+
+#### 标记扩展
+
+非常规方式设置属性的专门语法，例如：将属性值设置为一个已经存在的对象，或者通过一个属性绑定到另一个控件来动态地设置属性值。
+
+```C#
+        <Button  HorizontalAlignment="Center" VerticalAlignment="Center" Height="200"                    Width="100" Content="Hello">
+            <Button.Foreground>
+                <x:Static Member="SystemColors.ActiveCaptionBrush"></x:Static>
+                //标记扩展
+            </Button.Foreground>
+        </Button>
+```
+
+#### 附加属性
+
+用于多个控件，但是在另一个类中定义的属性。例如，当在一个容器中放置一个控件的时候，根据容器的类型控件会获得额外的特征。
+
+附加属性总是使用包含两个部分的命名形式：**定义类型.属性名**
+
+附加属性其实不是真正的属性，实际上转换成方法调用。
+
+#### 特殊字符与空白
+
+小于号(<) -----------------&lt；
+
+大于号(>)----------------- & gt; 如果一个控件的名字里面带有<或者>，需要用上面的符号代替，包括“；”
+
+XAML默认折叠所有的空白，可以使用xml:space="preserve" 保存所有空白字符。
+
+#### 事件
+
+语法：事件名=“事件处理程序方法名”
+
+WPF遵循的顺序：首先设置Name属性，然后关联所有的事件处理程序，最后设置其他属性。
+
+因此所有对属性变化做出响应的时间处理程序，在第一次设置属性的时候都会被触发。
+
+#### 完整的实例
+
+```c#
+    <Grid Name="grid1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBox VerticalAlignment="Stretch" HorizontalAlignment="Stretch" 
+                 Margin="10,10,13,10" Name="txtQuestion" 
+                 TextWrapping="Wrap" FontFamily="Verdana" FontSize="24" 
+                 Grid.Row="0">
+            [Place question here.]
+        </TextBox>
+        <Button VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Margin="10,0,0,20"
+                Width="127"
+                Height="23"
+                Name="cmdAnswer"
+                Click="cmdAnswer_Click"
+                Grid.Row="1">
+            Ask the Eight Ball
+        </Button>
+        <TextBox VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch"
+                 Margin="10,10,13,10"
+                 Name="txtAnswer"
+                 TextWrapping="Wrap"
+                 IsReadOnly="True"
+                 FontFamily="Verdana"
+                 FontSize="24"
+                 Foreground="Green"
+                 Grid.Row="2">
+            [Answer will appear here.]
+        </TextBox>
+        <Grid.Background>
+            <LinearGradientBrush>
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="0.00"
+                                  Color="Red" />
+                    <GradientStop Offset="0.50"
+                                  Color="Indigo" />
+                    <GradientStop Offset="1.00"
+                                  Color="Violet" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+        </Grid.Background>
+    </Grid>
+```
+
+![TIM图片20181122222213](F:\C#学习文档\学习图片\TIM图片20181122222213.png)
+
+### 使用其他名称空间中的类型
+
+
 
 ## 控件介绍
 
@@ -120,7 +238,7 @@
 
 * ComboBox控件
 
-  ## WPF面板布局
+## WPF面板布局
 
   ### 什么是布局？
 
@@ -137,7 +255,7 @@
 
 * Canvas是最轻量级的布局容器，使用固定的坐标绝对定位元素。不会自动调整内部元素的排列和大小。元素默认显示在画布的左上方，主要用来**画图**。默认不会自动剪裁超出自身范围的内容（ClipToBounds属性的默认值是false）。
 
-* Z顺序
+  #### Z顺序
 
   如果在Canvas面板中有多个相互重叠的元素，可以通过设置Canvas.ZIndex附加属性来控制他们的层叠方式。通常所有元素的ZIndex值为0，如果具有相同的Z值，则根据它们在Canvas.Children集合中的顺序进行显示，后声明的元素在先声明的元素上面。Z值大的元素在Z值小的元素上面。
 
@@ -150,7 +268,7 @@
   </Canvas>
   ```
 
-* InkCanvas元素
+  #### InkCanvas元素
 
   InkCanvas定义了四个附加属性（ToP/left/Bottom/Right），可以将这四个附加属性应用于子元素，异根据坐标进行定位。
 
@@ -204,7 +322,7 @@
   </Window>
   ```
 
-* 布局属性
+  #### 布局属性
 
   HorizontalAlignment：当水平方向有额外空间的时候可以决定元素在布局容器中如何定位。Center/Left等。
 
@@ -222,7 +340,7 @@
 
   **StackPanel面板也有自己的HorizontalAlignment和VerticalAlignment属性，默认为Stretch，故StackPanel面板充满容器。如果使用不同设置，尺寸将容纳最宽的控件。**
 
-* 边距
+  #### 边距
 
   设置边距时可以令所有边设置为相同宽度。
 
@@ -244,7 +362,7 @@
 
   **注意：**因为需要考虑相邻控件边距设置的相互影响，应该避免为不同的边设置不同的值。例如，在StackPanel中，按钮和面板本身使用相同的边距是比较合适的。
 
-* 尺寸
+  #### 尺寸
 
   Width和Height：显式地设置元素的尺寸，但是如果有必要，应该使用**最大尺寸和最小尺寸**，把控件限制在正确的范围内。在一个良好的布局设计中，显式地设置尺寸是不需要的。
 
@@ -260,7 +378,7 @@
 
   **顶级窗口的尺寸：**为了使窗口能够自动改变大小，需要删除Height和Width属性，并将Window.SizeToContent属性设置为WidthAndHeight，窗口就会调整自身的尺寸，从而足以容纳所包含的内容。还可以通过将SizeToContent属性设置为Width或Height，可以让窗口在一个方向上改变自身尺寸。
 
-* Border控件
+  #### Border控件
 
   Border类只能包含**一段**嵌套内容（通常是布局面板），并且为其添加背景或者边框。
 
@@ -285,7 +403,7 @@
 
   ### WrapPanel面板和DockPanel面板
 
-* WrapPanel面板
+  #### WrapPanel面板
 
   在可能的空间中，一次以一行或者一列的方式布置控件。默认WrapPanel.Orientation属性设置为Horizontal。控件从左向右排列，然后再下一行中排列。
 
@@ -303,7 +421,7 @@
           </WrapPanel>
   ```
 
-* DockPanel面板
+  #### DockPanel面板
 
   如果一个按钮停靠在DockPanel面板顶部，该按钮将会被拉伸至面板的整个宽度，但是根据内容和MinHeight属性为其设置所需的**高度**。显然停靠顺序也很重要。
 
@@ -337,7 +455,7 @@
 
   ### Grid面板
 
-* 三种设置尺寸的方式
+  #### 三种设置尺寸的方式
 
   绝对设置尺寸方式`<ColumnDefinition Width="100"/>
 
@@ -366,11 +484,11 @@
       </Grid>
   ```
 
-* 布局舍入
+  #### 布局舍入
 
   如果Grid面板的宽度为175像素，就不能很清晰的分割成两列，并且每列为87.5像素。可以通过布局容器的UseLayoutRounding属性设置为true解决此问题。
 
-* 跨越行列
+  #### 跨越行列
 
   ```C#
       <Grid ShowGridLines="True">
@@ -400,7 +518,7 @@
 
   注意：这种**占多行多列的布局并不好**，列宽由位于窗口底部的两个按钮的尺寸决定，继续添加新的内容变得困难。所以，对于一次性的布局任务，例如安排一组按钮，可以使用更小的布局容器。
 
-* 分割窗口
+  #### 分割窗口
 
   分隔条由GridSplitter类表示，是Grid面板的一个特性。
 
@@ -438,11 +556,12 @@
         </Grid>
     ```
 
-* 共享尺寸组
+  #### 共享尺寸组
 
   Grid面板中设置两列的ShareSizeGroup属性即可。
 
   例：<ColumnDenifition Width="Auto"  ShareSizeGroup="TextLable”/>
+
 
 ### 布局示例
 
@@ -493,3 +612,12 @@
 
 ​           **如果需要隐藏和显示元素，而且又不希望改变窗口布局和窗口中剩余元素的相对位置，使用此设置。**
 
+## 3D绘图
+
+### 视口
+
+包含3D内容的容器为Viewport3D类，继承自FrameworkElement类，能够放到放置正常元素的任何地方。
+
+Viewport3D类只应用于复杂的3D编程，只增加了两个属性：Camera和Children，前者定义了3D场景的观察者，后者包含了希望放置在场景中的所有3D对象。
+
+注意：Viewport3D的属性ClipToBounds,默认值为true，超出视口边界的内容将被剪裁掉。如果为false，内容将会显示在相邻元素上面。如果为false，渲染复杂场景时可以明显提高性能。
