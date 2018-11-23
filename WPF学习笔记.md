@@ -649,3 +649,54 @@ WPF遵循的顺序：首先设置Name属性，然后关联所有的事件处理�
 Viewport3D类只应用于复杂的3D编程，只增加了两个属性：Camera和Children，前者定义了3D场景的观察者，后者包含了希望放置在场景中的所有3D对象。
 
 注意：Viewport3D的属性ClipToBounds,默认值为true，超出视口边界的内容将被剪裁掉。如果为false，内容将会显示在相邻元素上面。如果为false，渲染复杂场景时可以明显提高性能。
+
+## WPF编程过程涉及的零散知识点
+
+### WPF中的URI
+
+* URI为统一资源标识符
+
+* 作用
+
+  指定当应用程序第一次启动时显示的用户界面
+
+  加载图像
+
+  导航到页
+
+  加载不可执行的数据文件
+
+  使用URI标识和加载位于各种位置的文件，包括当前程序集，所引用的程序集，相对于程序集的某个位置，应用程序的源站点。
+
+  #### 利用URI加载图像
+
+  * Visual Studio中，可以通过将一个文件添加到项目，并将其BuildAction（汉化名字为：生成操作）设置为Resource来创建资源文件
+
+  * 也可以直接通过Resources来添加需要的文件
+
+  * URI加载图像的一般形式：协议+授权+路径
+
+    **协议**：pack://
+
+    **授权**：第一种，访问编译时已知的文件，用application:///；第二种，访问编译时不知道，运行时才知道的文件，用siteoforigin:///。加载图片时选择前者，但是一般写成application:,,,形式
+
+    **路径**：绝对路径和相对路径
+
+  * 在XAML中指定路径
+
+    ```c#
+        <Window.Background>
+            <ImageBrush ImageSource="pack://application:,,,/Resources/海洋上位机界面最                     最终版.png"></ImageBrush>
+        </Window.Background>
+    ```
+
+  * 在代码中指定路径
+
+    ```C#
+    ImageBrush b = new ImageBrush();
+    b.ImageSource = new BitmapImage(new                                                           Uri("pack://application:,,,/Resources/海洋上位机界面最最终版.png"));
+    b.Stretch = Stretch.Fill;
+    this.Background = b;
+    ```
+
+
