@@ -152,6 +152,34 @@ WPF遵循的顺序：首先设置Name属性，然后关联所有的事件处理�
 
 ### 使用其他名称空间中的类型
 
+创建不是用于在XAML窗口显示的对象，比如当使用数据绑定并且希望在一个控件上显示从其他对象提取的信息时，或者希望使用一个非WPF对象为一个WPF对象设置属性时。
+
+语法：xmlns:***Prefix***="clr-namespace:***Namespace***; assembly=***AssemblyName***"
+
+```C#
+<Window x:Class="WpfApplication4.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+            //sys前缀映射到System名称空间，并使用System名称空间创建两个DateTime对象，并填充列表
+        Title="Eight Ball Answer"
+        Height="313"
+        Width="457">
+    <ListBox>
+        <ListBoxItem>
+            <sys:DateTime>10/13/2010 4:30 PM</sys:DateTime>           
+        </ListBoxItem>
+        <ListBoxItem>
+            <sys:DateTime>11/23/2018 2:43 PM</sys:DateTime>
+        </ListBoxItem>
+    </ListBox>
+</Window>
+```
+
+### 加载和编译XAML
+
+可以使用三种编码方式来创建WPF应用程序：只是用代码，使用代码和未编译的标记（XAML），使用代码和编译过的标记（BAML）。
+
 
 
 ## 控件介绍
