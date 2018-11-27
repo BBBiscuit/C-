@@ -640,13 +640,332 @@ WPF遵循的顺序：首先设置Name属性，然后关联所有的事件处理�
 
 ​           **如果需要隐藏和显示元素，而且又不希望改变窗口布局和窗口中剩余元素的相对位置，使用此设置。**
 
-## 依赖项属性
+## 属性系统
 
-### 理解依赖项属性
+### CLR属性
 
-* 第一步：定义表示属性的对象，它是DependencyProperty类的一个实例，必须设置为静态字段。
-* 第二步：使用WPF注册创建的依赖项属性。必须在与之关联的类的静态构造函数中进行。DependencyProperty为只读类型，通过DependencyProperty.Register()方法创建DependencyProperty实例。
-* 添加属性包装器，通过使用在DependencyObject基类中定义的GetValue()和SetValue（）方法。
+在程序中对私有变量声明的属性为CLR属性。
+
+作用：实现面向对象的封装；
+
+​           加入验证逻辑（比如在属性设置的时候加入一段代码，判断value的值是否满足要求）
+
+​           控制外部代码的访问权限（可读，可写，可读写）
+
+### 依赖属性
+
+* 依赖属性的特点
+
+  * 属性变更通知
+
+  例子：当鼠标移动到按钮上的时候，改变按钮的前景色
+
+  ```c#
+  //在XAML中通过依赖属性实现   
+  <Grid>
+          <Button Width="100" Height="30" >鼠标移到上面，颜色变成蓝色
+              <Button.Style>
+                  <Style TargetType="Button">
+                      <Style.Triggers>
+                          <Trigger Property="IsMouseOver"
+                                   Value="true">
+                              <Setter Property="Foreground"
+                                      Value="Blue"></Setter>
+                          </Trigger>
+                      </Style.Triggers>
+                  </Style>
+              </Button.Style>
+          </Button>
+      </Grid>
+  ```
+
+  ```C#
+      //代码实现，添加两个时间，鼠标进入控件事件，鼠标离开控件事件     
+      <Grid>
+          <Button Width="100" Height="30" 
+          MouseEnter="Button_MouseEnter"
+          MouseLeave="Button_MouseLeave">鼠标移到上面，颜色变成蓝色
+          </Button>
+      </Grid>
+      //后台代码
+      private void Button_MouseEnter(object sender, MouseEventArgs e)
+          {
+              Button btn = sender as Button;
+              if (btn != null)
+                  btn.Foreground = Brushes.Blue;
+          }
+  
+      private void Button_MouseLeave(object sender, MouseEventArgs e)
+          {
+              Button btn = sender as Button;
+              if (btn != null)
+                  btn.Foreground = Brushes.Black;
+          }
+  ```
+
+  * 属性值的继承
+
+    ```C#
+    //window的fontSize设置为18，Button控件和第一个TextBlock控件继承window的fontSize属性
+    //第二个textBlock控件使用自己的fontSize
+    <Window x:Class="WpfApplication8.MainWindow"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            Title="MainWindow" Height="350" Width="525" FontSize="18">
+        <Grid>
+            <Button Width="250" Height="30" >鼠标移到上面，颜色变成蓝色
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="true">
+                                <Setter Property="Foreground"
+                                        Value="Blue"></Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <StackPanel>
+                <TextBlock>我使用的是继承的fontSize</TextBlock>
+                <TextBlock FontSize="12">我使用的是自己的fontSize</TextBlock>
+            </StackPanel>
+        </Grid>
+    </Window>
+    ```
+
+  * 节省内存空间
+
+    CLR属性在new一个类的实例的时候会全部创建，需要占用内存空间。依赖属性只有在使用的时候才创建。
+
+* 依赖属性的定义
+
+  * 声明依赖属性变量
+  * 在属性系统中进行注册
+  * 使用.net属性包装依赖属性
+
+  ```C#
+  \\通过代码进行依赖属性的定义
+  \\第一步添加一个用户控件
+  \\编写后台代码添加依赖属性
+  
+  \\首先声明依赖属性变量（DependencyProperty依赖类型）
+  public static readonly DependencyProperty MyColorProperty;
+  \\在静态构造函数中对依赖变量进行注册
+  static MyDependencyProperty()
+  {
+      MyColorProperty = DependencyProperty.Register("Mycolor", typeof(string),                             typeof(MyDependencyProperty),
+                        new PropertyMetadata("Red", (s, e) => { }));
+  }
+  \\包装依赖属性（GetValue和SetValue方法）此处的MyColor与注册时候的名字一致
+  public string MyColor 
+  {
+  	get
+        {
+           return (string)GetValue(MyColorProperty);
+        }
+      set
+        {
+           SetValue(MyColorProperty,value);
+        }
+  }
+  \\注意：声明注册包装依赖属性比较复杂，可以通过在后台中输入代码propdp，然后按Tab可以快速定义依赖属性
+  ```
+
+* 依赖属性的应用
+
+  一个控件的内容改变的时候，可以让另一个控件发生变化。需要编写回调函数，例子省略。
+
+### 附加属性
+
+* 附加属性的特点
+
+  * 特殊的依赖属性
+  * 用于非定义该属性的类
+
+* 附加属性的定义
+
+  * 声明附加属性变量
+
+  * 在属性系统中进行注册
+
+  * 调用静态方法设置和获取属性值
+
+    在后台中输入propa，然后按Tab键可以快速定义
+
+* 附加属性的应用
+
+​       Grid的Row、Column等。
+
+## 路由事件
+
+### WPF的逻辑树和可视树
+
+* 逻辑树：描述WPF界面元素的实际结构，XAML中所有的UI元素组成。window/Grid等。
+* 可视树：界面上可见的**元素**构成，Visual或者Visual3D类派生出来的类
+
+### WPF路由事件
+
+* 路由事件：对元素树种多个侦听器调用处理的事件，是一个CLR事件
+
+* 冒泡事件：从源向它的父级元素传播；
+
+  隧道事件：从源向它的子级元素传播；
+
+* 路由事件的定义
+
+  * 声明路由事件变量并注册
+  * 通过标准的.net事件进行包装
+  * 产生传递事件
+
+  ```C#
+  //声明并注册
+  public static readonly RoutedEvent MyClickEvent = EventManager.RegisterRoutedEvent
+              ("MyClick", RoutingStrategy.Bubble,
+              typeof(RoutedEventHandler), typeof(RoutedEventControl));
+  //包装
+  public event RoutedEventHandler MyClick
+  {
+      add { AddHandler(MyClickEvent, value); }
+      remove { RemoveHandler(MyClickEvent, value); }
+  }
+  //产生传递事件
+  private void Button_Click(object sender, RoutedEventArgs e)
+  {
+      RoutedEventArgs arg = new RoutedEventArgs();
+      arg.Source = this;
+      arg.RoutedEvent = MyClickEvent;
+      RaiseEvent(arg);
+  }
+  ```
+
+## 控件
+
+### ComboBox控件
+
+```C#
+//新建一个工程叫做WpfCollectionControls，然后添加一个用户控件叫做ComboBoxUserControl
+//ComboBox数据源有两种，一是设置ComboBoxItem
+//在用户控件中添加ComboBox控件，并通过ComboBoxItem进行赋值
+<Grid>
+        <StackPanel>
+            <TextBlock>学生列表：</TextBlock>
+            //如果没有设置SelectedIndex="2"，则不显示任何值，设置为2则显示为选中王五。
+            //SelectedIndex是从0开始的，默认为-1，即没有选中项。
+            //SelectionChanged为ComboBox的常用事件
+            <ComboBox SelectedIndex="2" SelectionChanged="ComboBox_SelectionChanged">
+                <ComboBoxItem >
+                    <TextBlock>张三</TextBlock>
+                </ComboBoxItem>
+                <ComboBoxItem>
+                    <TextBlock>李四</TextBlock>
+                </ComboBoxItem>
+                <ComboBoxItem>
+                    <TextBlock>王五</TextBlock>
+                </ComboBoxItem>
+                <ComboBoxItem>
+                    <TextBlock>赵六</TextBlock>
+                </ComboBoxItem>
+            </ComboBox>
+        </StackPanel>    
+ </Grid>
+ //用户控件后台程序
+ //SelectedItem表示当前选中项
+ private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+{
+    var cb = (ComboBox)sender;
+    var selectedItem = cb.SelectedItem;
+    var selectedValue = cb.SelectedValue;
+    MessageBox.Show(string.Format("selectedItem={0} selectedValue=                                         {1}",selectedItem,selectedValue));
+}
+//在主窗口下将本地命名空间映射为loc前缀，然后调用loc中的用户控件
+<Window x:Class="WpfCollectionControls.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:WpfCollectionControls" 
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <loc:ComboBoxUserControl></loc:ComboBoxUserControl>
+    </Grid>
+</Window>
+```
+
+```C#
+//基于上述工程添加一个Student类作为数据源，这是设置ComboBoxItem的第二种方法
+//Student类，对于ComboBox来说属于复杂类型
+public class Student
+    {
+       public string Name { get; set; }
+       public int Age { get; set; }
+       public string Sex{ get; set; }
+       public string Address { get; set; }
+
+       public static List<Student> GetStudents()
+       { 
+           //var为动态类型，编译的时候才能确定类型
+           var studentList=new List<Student>();
+           for (int i = 0; i < 10; i++)
+           {
+               //注意此处创建Student类对象的方法
+               studentList.Add(new Student
+               {
+                   Name = string.Format("张{0}", i + 1),
+                   Age = 10 + i,
+                   Sex = i % 2 == 0 ? "Boy" : "Girl",
+                   Address = string.Format("北京市海淀区某某路{0}号", i + 1)
+               });
+           }
+           //返回数据
+           return studentList;
+       }
+    }
+//用户控件类XAML部分，即ComboBox相关
+    <Grid>
+        <StackPanel>
+            <TextBlock>学生列表：</TextBlock>
+            <ComboBox  ItemsSource="{Binding StudentList}" 
+        //数据为复杂对象，如果不设置DisplayMemberPath="Name"，则下拉列表里面为Student类名
+                       DisplayMemberPath="Name"
+        //数据为复杂对象，设置SelectedValuePath="Name"，则selectedValue为选中项的Name属性
+       				   SelectedValuePath="Name"
+                       SelectionChanged="ComboBox_SelectionChanged">            
+            </ComboBox>
+        </StackPanel>    
+    </Grid>
+//用户控件后台代码
+public partial class ComboBoxUserControl : UserControl
+ {
+     public List<Student> StudentList { get; set; }
+     public ComboBoxUserControl()
+        {
+            InitializeComponent();
+            this.StudentList = Student.GetStudents();
+            //获取或设置元素参与数据绑定时的数据上下文。
+            this.DataContext = this;
+   	    }
+
+private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var cb = (ComboBox)sender;
+       //对于复杂类型，如果不把当前想转化为Student类型并输出SelectedItem.Name，则会输出Student
+            var selectedItem = cb.SelectedItem as Student;
+            var selectedValue = cb.SelectedValue;
+            //SelectedValue的值和SelectedValuePath有关
+            MessageBox.Show(string.Format("selectedItem={0} selectedValue={1}",                                                  selectedItem.Name,selectedValue));
+        }
+//主窗口
+<Window x:Class="WpfCollectionControls.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:WpfCollectionControls" 
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <loc:ComboBoxUserControl></loc:ComboBoxUserControl>
+    </Grid>
+</Window>
+```
+
+
 
 ## 3D绘图
 
