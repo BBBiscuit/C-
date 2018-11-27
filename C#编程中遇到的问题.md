@@ -49,5 +49,115 @@ b.Stretch = Stretch.Fill;
 this.Background = b;
 ```
 
+## WPF中控制窗口显示位置
 
+首先新建一个WPF工程，在主界面添加一个按钮，并给按钮添加点击事件button1_Click，然后新建一个用于测试弹出位置的窗口TestWindow。
+1、在屏幕中间显示，设置window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+
+```C#
+private void button1_Click(object sender, RoutedEventArgs e)
+{
+    TestWindow window = new TestWindow();
+    window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+    window.ShowDialog();
+}
+```
+
+2、在父窗口中间显示，设置window.WindowStartupLocation = WindowStartupLocation.CenterOwner;，并指定Owner。
+
+```C#
+private void button1_Click(object sender, RoutedEventArgs e)
+{
+    TestWindow window = new TestWindow();
+    window.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+    window.Owner = this;
+    window.ShowDialog();
+}
+```
+
+
+
+3、在任意位置显示，设置window.WindowStartupLocation = WindowStartupLocation.Manual;并制定窗口的Left和Top坐标。
+
+```C#
+private void button1_Click(object sender, RoutedEventArgs e)
+{
+    TestWindow window = new TestWindow();
+    window.WindowStartupLocation = WindowStartupLocation.Manual;
+    window.Left = 0;
+    window.Top = 0;
+    window.ShowDialog()；
+}
+```
+
+
+
+## 3. 让按钮变成圆角
+
+```C#
+        <Button Content="Button"
+                HorizontalAlignment="Left"
+                Margin="185,122,0,0"
+                VerticalAlignment="Top"
+                Width="75">
+            <Button.Template>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border BorderBrush="{TemplateBinding Control.BorderBrush}"
+                            BorderThickness="0"
+                            CornerRadius="10,10,10,10">
+                        <Border.Background>
+                            <LinearGradientBrush EndPoint="0,1"
+                                                 StartPoint="0,0">
+                                <GradientStop Color="White"
+                                              Offset="0.0" />
+                                <GradientStop Color="Silver"
+                                              Offset="0.5" />
+                                <GradientStop Color="White"
+                                              Offset="0.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center">                            
+                        </ContentPresenter>
+                    </Border>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+```
+
+## 如何让Lable换行
+
+```C#
+            <Label Content="    输入 &#13;三相电流" //&#13;相当于\r\n
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontWeight="Bold"
+                   Margin="68,20,0,0"
+                   Height="45" />
+```
+
+## WPF中的Lable实时显示时间
+
+```C#
+//在WPF中使用DispatcherTimer定时器     
+private static DispatcherTimer dateTimer = new DispatcherTimer();
+void InitialTimer()
+{ 
+    dateTimer.Interval = TimeSpan.FromMilliseconds(1000); //设置定时器间隔
+    dateTimer.Tick += dateTimer_Tick; //1秒计时完成触发该事件
+    dateTimer.Start(); //启动定时器
+}
+//注意不要将定时器出发事件声明为静态方法，否则无法使用控件，如timeShow/dateShow等Lable
+void dateTimer_Tick(object sender, EventArgs e)//定时器触发事件
+{
+    timeShow.Content = DateTime.Now.ToString("HH:mm:ss");
+    dateShow.Content = DateTime.Now.ToString("yyyy/MM/dd");
+}
+public MainWindow()
+{
+    InitializeComponent();
+    InitialTimer();//主窗口构造函数中调用定时器的初始化函数（配置并启动定时器）
+}
+```
 

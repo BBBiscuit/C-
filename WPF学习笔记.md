@@ -640,6 +640,14 @@ WPF遵循的顺序：首先设置Name属性，然后关联所有的事件处理�
 
 ​           **如果需要隐藏和显示元素，而且又不希望改变窗口布局和窗口中剩余元素的相对位置，使用此设置。**
 
+## 依赖项属性
+
+### 理解依赖项属性
+
+* 第一步：定义表示属性的对象，它是DependencyProperty类的一个实例，必须设置为静态字段。
+* 第二步：使用WPF注册创建的依赖项属性。必须在与之关联的类的静态构造函数中进行。DependencyProperty为只读类型，通过DependencyProperty.Register()方法创建DependencyProperty实例。
+* 添加属性包装器，通过使用在DependencyObject基类中定义的GetValue()和SetValue（）方法。
+
 ## 3D绘图
 
 ### 视口
