@@ -14,6 +14,29 @@ KeyPress主要用来捕获数字、字母，只能捕获单个字符，不区分
 
 KeyDown和KeyUp可以捕获组合键，可以捕获除PrScrn之外的所有按键
 
+```C#
+//对应TextBox控件的KeyPress事件
+private void DiyDutyCycleNum_KeyPress(object sender, KeyPressEventArgs e)
+{
+    //如果输入的数字是允许的则不进行任何处理
+    //如果输入的数字是不允许的，则设置e.Handled=true，则输入无效。
+	if (e.KeyChar != '\b')//这是允许输入退格键  
+	{
+        int len = DiyCycleNum.Text.Length;//获得当前控件文本长度
+        if (len < 1 && e.KeyChar == '0') //文本首位不能为0
+        {
+            e.Handled = true;
+        }
+        else if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字  
+        {
+            e.Handled = true;
+        }
+	}	
+}
+```
+
+
+
 ### 利用int.Parse()
 
 ```c#
@@ -43,10 +66,9 @@ bool b = int.TryParse("123", out i);
 ### XAML中实现
 
 ```C#
-ImageBrush b = new ImageBrush();
-b.ImageSource = new BitmapImage(new                                                           Uri("pack://application:,,,/Resources/海洋上位机界面最最终版.png"));
-b.Stretch = Stretch.Fill;
-this.Background = b;
+   <Window.Background>
+        <ImageBrush ImageSource="pack://application:,,,/Resources/海洋上位机界面最最终                                      版.png"></ImageBrush>
+    </Window.Background>
 ```
 
 ## WPF中控制窗口显示位置
