@@ -841,6 +841,58 @@ WPF遵循的顺序：首先设置Name属性，然后关联所有的事件处理�
 
 ## 控件
 
+### 画刷及字体
+
+* 使用代码设置颜色
+
+  WPF中画刷使用Brush对象，可以使用单一颜色SolidColorBrush画刷，或者特殊颜色LinearGradientBrush画刷或者TileBrush画刷。
+
+  ```C#
+  //WPF中使用Background和Foreground设置控件的背景色（控件表面）和前景色（文本）。
+  btnTest.Background = new SolidColorBrush(Color.AliceBlue);
+  ```
+
+* 在XAML中设置颜色
+
+  ```C#
+  //第一种方式
+  <Button Background="Red">A Button</Button>
+  //第二种方式
+          <Button>A Button
+              <Button.Background>
+                  <SolidColorBrush Color="Red"></SolidColorBrush>
+              </Button.Background>
+          </Button>
+  //设置alpha/红/绿/蓝的数值来决定颜色，其中alpha为透明度，数值均为0到255之间的数
+  //alpha为FF，即255时，完全不透明
+    <Button Background="#FFFF0000">A Button </Button>
+  ```
+
+* 字体
+
+  * FontFamily      字体名称
+  * FontSize           字体的设备无关单位尺寸
+  * FontStyle          文本角度
+  * FontWeight       文本重量，如Bold
+  * FontStretch       字体被拉伸或者压缩的程度
+
+  ```C#
+  //用逗号分隔字体选项列表，WPF将按照顺序遍历列表，哪个字体在前并且存在，则选择哪个字体
+  <Button FontFamily=“Technical Italic,Comic Sans MS, Arial”>A Button</Button>
+  ```
+
+* 鼠标光标
+
+  获取Cursor对象的最简单方法是使用Cursors类的静态属性，它包含了所有标准的Windows鼠标光标，如沙漏光标，手状光标，调整尺寸的箭头光标等。
+
+  ```C#
+  //代码实现将鼠标设置为沙漏光标
+  this.Cursor = Cursors.Wait;
+  //XAML实现
+  <Button Cursor="Help">Help</Button>
+  ```
+
+
 ### ComboBox控件
 
 ```C#
