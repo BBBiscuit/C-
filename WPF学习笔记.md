@@ -1163,6 +1163,176 @@ private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs 
 
 ### TabControl
 
+* TabControl控件的特点
+
+  * 可以包含多个子页面
+  * 子页面之间进行自由切换
+
+* 常用属性
+
+  * TabStripPlacement: Left, Top, Right, Bottom
+  * TabItem:Header, IsSelected, Content
+
+  ```C#
+   //TabControl用户控件XAML部分   
+    <Grid>
+    //SelectedIndex="3"默认选中Tab4，但是优先级低于IsSelected
+          <TabControl TabStripPlacement="Top" SelectedIndex="3">
+              <TabItem Header="Tab1">
+                  <TextBlock>我是第一个Tab页</TextBlock>
+              </TabItem>
+              
+              //通过设置IsSelected="True"，默认选中Tab2页
+              <TabItem Header="Tab2" IsSelected="True">
+               //TabItem中添加控件内容
+                  <TextBlock>我是第二个Tab页</TextBlock>
+              </TabItem>
+              
+              <TabItem Header="Tab3">
+                  <TextBlock>我是第三个Tab页</TextBlock>
+              </TabItem>
+              <TabItem Header="Tab4">
+                  <TextBlock>我是第四个Tab页</TextBlock>
+              </TabItem>
+              <TabItem Header="Tab5">
+                  <TextBlock>我是第五个Tab页</TextBlock>
+              </TabItem>
+          </TabControl>
+      </Grid>
+  ```
+
+### DataGrid
+
+* 特点
+
+  * 多行多列展示数据源
+  * 自带编辑功能
+
+* 常用属性
+
+  * SelectedItem , SelectedIndex , ItemsSource
+
+  * AutoGenerateColumns  自动生成列，默认为true 
+
+    如果有自定义的列，则先显示自定义列再显示自动生成的列
+
+  * IsReadOnly 默认为false,可以读写
+
+  * CanUserAddRows 默认为true,可以添加行
+
+  * CanUserDeleteRows 默认为true,可以删除行
+
+  * CanUserReorderColumns 默认为true,是否可以通过鼠标拖动重新排列列头
+
+  * CanUserResizeColumns 默认为true,是否可以调整列宽
+
+  * CanUserResizeRows 默认为true,是否可以调整行高
+
+  * CanUserSortColumns 默认为true,点击列头是否可以进行排序（比如根据数字的升序/降序）
+
+  * FrozenColumnCount  int型，默认为0
+
+    设置为大于0的数，将该几行冻结，窗口比较小的时候拉动滚动条，不影响冻结列
+
+  * SelectionMode 
+
+* 事件
+
+  * LoadingRow 加载数据行的时候触发
+  * SelectionChanged 
+
+* 数据源配置
+
+  * ItemsSource设置数据源
+  * DataGridTextColumn设置列显示的属性
+
+  ```C#
+  //用户控件XAML
+  //这里采用了两种数据源来设置DataGrid，第一种是通过ItemsSource="{Binding StudentList}
+  //因为AutoGenerateColumns属性默认为"True"，直接运行可以得到一个DataGrid表，表头来自于数据源
+  //第二种是通过DataGridTextColumn自定义列，可以自定义列头，绑定数据。但AutoGenerateColumns
+  //属性需要为"False",否则会先显示自定义列，再显示自动生成的列。
+   <Grid>
+          <DataGrid ItemsSource="{Binding StudentList}"
+                    AutoGenerateColumns="True"
+                    IsReadOnly="False"
+                    CanUserAddRows="True"
+                    CanUserDeleteRows="False"
+                    CanUserReorderColumns="False"
+                    CanUserResizeColumns="False"
+                    CanUserSortColumns="True"
+                    FrozenColumnCount="2"
+       //SelectionMode和SelectionUnit配合使用，可以选中单行或者多行，或者单个单元格，多个单元格
+                    SelectionMode="Extended"
+                    SelectionUnit="FullRow"
+                    LoadingRow="DataGrid_LoadingRow">
+              <DataGrid.Columns>
+                  <DataGridTextColumn Header="姓名"
+                                      Binding="{Binding Name}"></DataGridTextColumn>
+                  <DataGridTextColumn Header="性别"
+                                      Binding="{Binding Sex}"></DataGridTextColumn>
+                  <DataGridTextColumn Header="年龄"
+                                      Binding="{Binding Age}"></DataGridTextColumn>
+                  <DataGridTextColumn Header="地址"
+                                      Binding="{Binding Address}"></DataGridTextColumn>
+              </DataGrid.Columns>
+          </DataGrid>    
+      </Grid>
+  ```
+
+### TreeView
+
+* TreeView控件特点
+
+  * 树形结构的视图控件
+  * 非叶子节点支持展开，折叠显示
+  * TreeViewItem元素
+
+* TreeView属性
+
+  * SelectedItem
+  * SelectedValue
+  * SelectedValuePath
+
+* TreeView常用事件
+
+  * SeletedItemChanged
+
+* TreeViewItem常用属性
+
+  * IsExpanded 是否展开
+  * IsSelected 是否选中
+
+* TreeViewItem常用事件
+
+  * Expanded 展开的时候触发，并将IsExpanded设置为true
+  * Collapsed 折叠的时候触发，并将IsExpanded设置为false
+  * Selected  TreeViewItem选中触发，并将IsSelected设置为true
+  * Unselected  TreeViewItem未选中触发，并将IsSelected设置为false
+
+* TreeView数据源配置
+
+  * TreeViewItem
+  * ItemsSource设置数据源
+  * ItemTemplate设置子级模板
+
+  ```C#
+   //数据源通过TreeViewItem设置 
+   <Grid>
+          <TreeView SelectedItemChanged="TreeView_SelectedItemChanged">
+              <TreeViewItem Header="父级节点" IsExpanded="False"
+                            Expanded="TreeViewItem_Expanded"
+                            Collapsed="TreeViewItem_Collapsed"
+                            Selected="TreeViewItem_Selected"
+                            Unselected="TreeViewItem_Unselected">
+                           
+                  <TreeViewItem Header="子级节点1" IsSelected="False"></TreeViewItem>
+                  <TreeViewItem Header="子级节点2"></TreeViewItem>
+                  <TreeViewItem Header="子级节点3"></TreeViewItem>               
+              </TreeViewItem>
+          </TreeView>    
+      </Grid>
+  ```
 
 
 
