@@ -1017,6 +1017,153 @@ private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs 
 </Window>
 ```
 
+### ListBox
+
+* 常用属性
+
+  除了ComboBox所讲的属性外，还有SelectionMode和SelectedItems。
+
+  SelectionMode可选值：Single（一次选择要给项）、Multiple（可以选择任意项）、Extended（可以选择多个项，但是需要shift或者Ctrl）.
+
+  SelectedItems是所有选中项的集合，可以是一个或者多个。
+
+* ListBox数据源如何配置
+
+  * 设置ListBoxItem项
+  * 通过ItemSource设置数据源，DisplayMemberPath设置显示的属性
+
+  ```C#
+      //主窗口界面添加本地用户控件
+      <Grid>
+          <loc:ListBoxUserControl></loc:ListBoxUserControl>
+      </Grid>
+        //在用户控件XMAL中添加ListBox
+         <DockPanel>
+              <TextBlock DockPanel.Dock="Top">学生列表</TextBlock>
+              <ListBox  ItemsSource="{Binding StudentList}"
+                        DisplayMemberPath="Name"
+                        SelectionMode="Multiple"
+                        SelectionChanged="ListBox_SelectionChanged">               
+              </ListBox>
+          </DockPanel>
+  ```
+
+### ListView
+
+* ListView控件的特点
+
+  * 继承自ListBox控件
+  * 更加丰富的显示对象的多个属性
+  * 多个View显示属性
+
+* 常用属性
+
+  * 与ListBox常用属性基本一致
+  * View, GridView, GridViewColumn\
+
+* 数据源
+
+  * 设置它的ListViewItem项
+  * ItemsSource设置数据源，GridView设置显示的属性
+
+  ```C#
+  //ListViewUserControl用户控件的xaml部分
+  <UserControl x:Class="WpfCollectionControls.ListViewUserControl"
+               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+               xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+               mc:Ignorable="d" 
+               d:DesignHeight="300" d:DesignWidth="300">
+      //添加了一个UserControl.Resources，并放入两个GridView
+      <UserControl.Resources>
+          <GridView x:Key="View0">
+          <GridViewColumn Header="姓名"
+                          DisplayMemberBinding="{Binding Name}"> </GridViewColumn>
+          <GridViewColumn Header="年龄"
+                          DisplayMemberBinding="{Binding Age}"></GridViewColumn>
+          <GridViewColumn Header="性别"
+                          DisplayMemberBinding="{Binding Sex}"></GridViewColumn>
+          <GridViewColumn Header="地址"
+                          DisplayMemberBinding="{Binding Address}"></GridViewColumn>
+          </GridView>
+          <GridView x:Key="View1">
+              <GridViewColumn Header="姓名"
+                              DisplayMemberBinding="{Binding Name}"></GridViewColumn>
+              <GridViewColumn Header="年龄"
+                              DisplayMemberBinding="{Binding Age}"></GridViewColumn>
+              <GridViewColumn Header="性别"
+                              DisplayMemberBinding="{Binding Sex}"></GridViewColumn>
+  
+          </GridView>
+      </UserControl.Resources>
+      
+      <Grid>
+          <DockPanel>
+          //通过CheckBox的Checked和Unchecked事件来切换视图
+              <CheckBox DockPanel.Dock="Top" Checked="CheckBox_Checked"
+                        Unchecked="CheckBox_Unchecked">切换视图</CheckBox>
+              <TextBlock DockPanel.Dock="Top">学生列表</TextBlock>
+              //绑定数据来源，默认视图为View0
+              <ListView x:Name="listView"
+                        ItemsSource="{Binding StudentList}" 
+                        View="{StaticResource View0}">
+              </ListView>
+          </DockPanel>
+      </Grid>
+  </UserControl>
+  //ListViewUserControl用户控件的后台代码部分
+  namespace WpfCollectionControls
+  {
+      /// <summary>
+      /// ListViewUserControl.xaml 的交互逻辑
+      /// </summary>
+      public partial class ListViewUserControl : UserControl
+      {
+          //控件数据源
+          public List<Student> StudentList { get; set; }
+          public ListViewUserControl()
+          {
+              InitializeComponent();
+              this.StudentList = Student.GetStudents();
+              this.DataContext = this；//获取或设置元素参与数据绑定时的数据上下文
+          }
+  
+          private void CheckBox_Checked(object sender, RoutedEventArgs e)
+          {
+             //listView为控件ListView的Name
+              var chbox = (CheckBox)sender;
+              //搜索具有指定密钥的资源
+              var view = (GridView)this.FindResource("View1");
+              this.listView.View = view;
+          }
+  
+          private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+          {
+              var chbox = (CheckBox)sender;
+              var view = (GridView)this.FindResource("View0");
+              this.listView.View = view;
+          }
+      }
+  }
+  //MainWindowXAML部分
+  <Window x:Class="WpfCollectionControls.MainWindow"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          //将命名空间映射到loc
+          xmlns:loc="clr-namespace:WpfCollectionControls" 
+          Title="MainWindow" Height="350" Width="525"
+          FontSize="18">
+      <Grid>
+      //添加控件
+          <loc:ListViewUserControl></loc:ListViewUserControl>
+      </Grid>
+  </Window>
+  ```
+
+### TabControl
+
+
 
 
 ## 3D绘图
