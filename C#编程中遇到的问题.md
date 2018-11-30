@@ -1,6 +1,6 @@
 [TOC]
 
-## 一、如何让TextBox只能输入整型格式的字符串？
+## 1、如何让TextBox只能输入整型格式的字符串？
 
 ### 利用KeyPress事件
 
@@ -51,7 +51,7 @@ bool b = int.TryParse("123", out i);
 //执行完毕后，b等于true，i等于123；
 ```
 
-## 二、如何设置WPF的主界面背景为一张图片
+## 2、如何设置WPF的主界面背景为一张图片
 
 ### 代码中实现
 
@@ -71,7 +71,7 @@ bool b = int.TryParse("123", out i);
     </Window.Background>
 ```
 
-## WPF中控制窗口显示位置
+## 3、WPF中控制窗口显示位置
 
 首先新建一个WPF工程，在主界面添加一个按钮，并给按钮添加点击事件button1_Click，然后新建一个用于测试弹出位置的窗口TestWindow。
 1、在屏幕中间显示，设置window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -114,7 +114,7 @@ private void button1_Click(object sender, RoutedEventArgs e)
 
 
 
-## 3. 让按钮变成圆角
+## 4、 让按钮变成圆角
 
 ```C#
         <Button Content="Button"
@@ -148,7 +148,7 @@ private void button1_Click(object sender, RoutedEventArgs e)
         </Button>
 ```
 
-## 如何让Lable换行
+## 5、如何让Lable换行
 
 ```C#
             <Label Content="    输入 &#13;三相电流" //&#13;相当于\r\n
@@ -159,7 +159,7 @@ private void button1_Click(object sender, RoutedEventArgs e)
                    Height="45" />
 ```
 
-## WPF中的Lable实时显示时间
+## 6、WPF中的Lable实时显示时间
 
 ```C#
 //在WPF中使用DispatcherTimer定时器     
@@ -183,3 +183,40 @@ public MainWindow()
 }
 ```
 
+## 7、调用线程无法访问此对象,因为另一个线程拥有该对象
+
+​       WPF中在对界面进行操作的时候，可能会遇到“调用线程无法访问此对象,因为另一个线程拥有该对象”异常，这是因为**WPF中只有UI线程才能操作UI元素，非UI线程要访问UI时就会报异常了。**
+
+解决方法：
+
+```C#
+Dispatcher.BeginInvoke(new Action(delegate
+{
+
+   //执行你的方法
+
+}));
+```
+
+**知识点**：
+
+Dispatcher.Invoke是同步执行，返回值是object， 是被调用的委托的返回值，如果该委托没有返回值，则为null。它有好几个重载方法，下面是其中之一：
+
+```C#
+public Object Invoke(
+	Delegate method,
+	paramsObject[] args
+)
+```
+
+Dispatcher.BeginInvoke是异步执行, 它有好几个重载方法，下面是其中之一：
+
+```C#
+public DispatcherOperation BeginInvoke(
+	Delegate method,
+	params Object[] args
+)
+//args:作为给定方法的参数传递的对象数组。 可以为 null。
+```
+
+不同点是Dispatcher.Invoke直到回调返回之后才将控制权返回给调用对象。Dispatcher.BeginInvoke是立即返回控制权给调用对象，只是把delegate加到消息循环中。

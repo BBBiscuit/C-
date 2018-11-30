@@ -1332,7 +1332,92 @@ private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs 
               </TreeViewItem>
           </TreeView>    
       </Grid>
+      //ItemsSource设置数据源，ItemTemplate设置子级模板
+          <Grid>
+          <TreeView ItemsSource="{Binding StudentList}"                                                  SelectedItemChanged="TreeView_SelectedItemChanged">
+              <TreeView.ItemTemplate>
+                  <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                      <TextBlock Text="{Binding Name}"></TextBlock>
+                  </HierarchicalDataTemplate>
+              </TreeView.ItemTemplate>
+          </TreeView>    
+      </Grid>
   ```
+
+### ToolBar
+
+* 特点
+  * 功能相近控件的容器
+  * 提供一种溢出机制
+  * 与ToolBarTray控件一起使用
+  * 重载子项的默认样式
+* ToolBar属性：OverflowMode 是否在溢出区域
+* ToolBarTray属性：IsLocked 是否可以拖拽，Orientation
+
+```C#
+    <Grid>
+        <StackPanel>
+        //注意不同属性放在不同的控件里进行设置
+            <ToolBarTray IsLocked="False" Orientation="Vertical">
+                <ToolBar>
+                    <Button>文件</Button>
+                    <Button>编辑</Button>
+                    <Button>视图</Button>
+                    <Button>项目</Button>
+                    <Button ToolBar.OverflowMode="Always">生成</Button>
+                </ToolBar>
+                <ToolBar>
+                    <Button>文件</Button>
+                    <Button>编辑</Button>
+                    <Button>视图</Button>
+                    <Button>项目</Button>
+                    <Button ToolBar.OverflowMode="Always">生成</Button>
+                </ToolBar>
+            </ToolBarTray>
+        </StackPanel>    
+    </Grid>
+```
+
+### StatusBar
+
+* 特点
+  * 显示应用程序状态信息
+  * 一般放在窗口的底部
+  * StatusBarItem包装子项
+  * Separator分割子项
+
+```C#
+  //用户控件的XAML部分
+   <Grid>
+        <DockPanel>
+            <StatusBar DockPanel.Dock="Bottom">
+                <StatusBarItem>
+                    <TextBlock>当前字数：</TextBlock>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock Name="tblCount"></TextBlock>
+                </StatusBarItem>
+                //分割线
+                <Separator></Separator>
+                <StatusBarItem>
+                    <TextBlock>页面：</TextBlock>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock>1/4</TextBlock>
+                </StatusBarItem>
+            </StatusBar>
+            <TextBox TextChanged="TextBox_TextChanged"></TextBox>
+        </DockPanel>
+    </Grid>
+    
+    //TextBox触发事件
+      private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var tb = (TextBox)sender;
+            this.tblCount.Text = tb.Text.Length.ToString();
+        }
+```
+
 
 
 
