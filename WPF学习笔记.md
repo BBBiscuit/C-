@@ -892,6 +892,37 @@ WPF遵循的顺序：首先设置Name属性，然后关联所有的事件处理�
   <Button Cursor="Help">Help</Button>
   ```
 
+### 内容控件
+
+* 对齐内容 
+
+  可以通过HorizontalAlignment和verticalAlignment属性在容器中对齐不同的控件。
+
+  若控件包含内容，通过HorizontalContentAlignment和VerticalContentAlignment属性实现内容和边框对齐
+
+* 工具提示（tooltip）
+
+  当在感兴趣的内容上悬停鼠标的时候，会弹出提示。
+
+  ```C#
+  //简单提示
+  <Button Tooltip="This is my tooltip">I have a tooltip</Button>
+  //复杂提示
+  <Button Height="50" Width="100" Content="关闭窗口">
+      <Button.ToolTip>
+      	<StackPanel>
+     			 <TextBlock Margin="3">Image and text</TextBlock>
+               <Image Source="此处填写图片路径" Stretch="None" />
+     			 <TextBlock Margin="3">Image and text</TextBlock>
+          </StackPanel>
+      </Button.ToolTip>
+  </Button>
+  ```
+
+### ScrollViewer
+
+如果希望让大量的内容适应有限的控件，可以利用滚动特性。WPF中为了获得滚动支持，需要在ScrollViewer控件中包装希望滚动的内容。**通常使用它包装一个布局容器。**
+
 
 ### ComboBox控件
 
@@ -1418,7 +1449,169 @@ private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs 
         }
 ```
 
+## 元素绑定
 
+### 绑定表达式
+
+在使用数据绑定的时候，不需要对源对象进行任何改变，只需要配置源对象使其属性具有正确的值范围。
+
+```C#
+//通过一个Slider滑动控件来控制一个TextBlock控件字体的大小
+<Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Slider Name="SliderFontSize" Margin="3" 
+                Grid.Row="0"
+                Minimum="1" Maximum="40" Value="10"
+    //TickFrequency代表刻度值，TickPlacement代表刻度线所在位置
+                TickFrequency="1" TickPlacement="TopLeft">          
+        </Slider>
+        <TextBlock Margin="10"
+                   Grid.Row="1"
+                   Text="Simple Text"
+                   Name="lblSampleText"
+                   FontSize="{Binding ElementName=SliderFontSize, Path=Value}">         
+        </TextBlock>
+    </Grid>
+ //代码实现
+  Binding binding = new Binding();
+  binding.Source = SliderFontSize;
+  binding.Path = new PropertyPath("Value");
+  binding.Mode = BindingMode.TwoWay;
+  lblSampleText.SetBinding(TextBlock.FontSizeProperty,binding);
+```
+
+### 多绑定
+
+TextBlock控件文本和TextBox绑定，字体和Slider绑定，**颜色和ListBox的选项绑定**（未实现）
+
+```C#
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Slider Name="SliderFontSize" Margin="3" 
+                Grid.Row="0"
+                Minimum="1" Maximum="40" Value="10"
+                TickFrequency="1" TickPlacement="TopLeft">          
+        </Slider>
+        <TextBox Grid.Row="1" Name="txtContent"></TextBox>
+        <ListBox Grid.Row="2" Name="LstColors">
+            <ListBoxItem>Blue</ListBoxItem>
+            <ListBoxItem>Dark Blue</ListBoxItem>
+            <ListBoxItem>Light Blue</ListBoxItem>
+        </ListBox>
+        <TextBlock Margin="10"
+                   Grid.Row="3"
+                   Name="lblSampleText"
+                   FontSize="{Binding ElementName=SliderFontSize, Path=Value}"
+                   Text="{Binding ElementName=txtContent, Path=Text}"
+                   Foreground="{Binding ElementName=LstColors, Path=SelectedItem.Tag}">         
+        </TextBlock>
+    </Grid>
+```
+
+### 链接数据绑定及绑定模式
+
+TextBlock控件的文本字体大小绑定到Slider控件，TextBox控件的Text绑定到TextBlock的字体大小。两个绑定模式均为**双向绑定**，则可以通过滑动Slider实现字体大小的变化，并且在TextBox中显示当前字体大小的值。同时也可以通过在TextBox中输入数字来控制字体的大小，并且改变滑动块的位置。
+
+问题1：Slider.Value为双精度类型，所以可以通过IsSnapToTickEnabled="True"/确保滑动条取值都为整数。
+
+问题2：文本框可以输入字母等非数字字符，则绑定失败，字体尺寸被设置为0。（实际测试未被设置成0，只是不起作用而已），可以通过处理文本框的按下键阻止非法输入，或者适用数据绑定验证。
+
+问题3：直到文本框失去焦点，才会应用文本框中的改变。可以通过Binding对象的UpdateSourceTrigger属性立即进行更新。
+
+```C#
+<Grid>
+	<Grid.RowDefinitions>
+    	<RowDefinition></RowDefinition>
+        <RowDefinition></RowDefinition>
+        <RowDefinition></RowDefinition>
+    </Grid.RowDefinitions>
+    <Slider Name="SliderFontSize" Margin="3" Grid.Row="0"
+                Minimum="1" Maximum="40" Value="10"
+                TickFrequency="1" TickPlacement="TopLeft"                                           IsSnapToTickEnabled="True"> //确保滑动条取值都为整数       
+    </Slider>
+    <TextBox Grid.Row="2"
+             Text="{Binding ElementName=lblSampleText, Path=FontSize,Mode=TwoWay}">     </TextBox>
+    <TextBlock Margin="10" Grid.Row="1" Text="Sample Text" Name="lblSampleText"
+               FontSize="{Binding ElementName=SliderFontSize, Path=Value,                                   Mode=TwoWay}">         
+    </TextBlock>
+ </Grid>
+```
+
+### 绑定更新
+
+改变源的值，则会立即传播到目标。但是改变目标的值，未必会立即发生。由Binding.UpdateSourceTrigger属性控制。可取值为PropertyChanged（目标属性变化时立即更新源）、LostFocus（目标属性变化并且目标丢失焦点时更新源），Explicit（调用BindingExpression.UpdateSource（）方法更新源）。
+
+注意1：PropertyChanged更新模式下，文本框中文本的不断变化会引起多次更新，会使应用程序的运行更加缓慢。导致源对象在编辑完成之前重新更新自身，可能会引起验证问题。
+
+注意2：调用BindingExpression.UpdateSource（）方法之前，需要获取调用BindingExpression对象。
+
+```C#
+BindingEpression binding=txtFontSize.GetBindingExpression(TextBox.TextProperty);
+binding.UpdateSource();
+```
+
+在上例中TextBox控件中添加属性 UpdateSourceTrigger=PropertyChanged，则可实现立即更新
+
+```C#
+//在上例中TextBox控件中添加属性 UpdateSourceTrigger=PropertyChanged，则可实现立即更新
+<TextBox Grid.Row="2"
+          Text="{Binding ElementName=lblSampleText, Path=FontSize, Mode=TwoWay,                   UpdateSourceTrigger=PropertyChanged}" >
+ </TextBox>      
+```
+
+### 绑定到非元素对象
+
+将元素和一个公有属性绑定，放弃Binding.ElementName属性，使用Source、RelativeSource、DataContext等属性。
+
+* Source属性
+
+  ```
+  <TextBlock  Text="{Binding Source={x:Static SystemFonts.IconFontFamily},
+               Path=Source}"/>         
+  ```
+
+* RelativeSource属性
+
+  ```C#
+  //方法一
+  <TextBlock>       
+  	<TextBlock.Text>
+      	<Binding Path="Title">
+          	<Binding.RelativeSource>
+              	<RelativeSource Mode="FindAncestor"
+      							AncestorType="{x:Type Window}">
+                  </RelativeSource>
+              </Binding.RelativeSource>
+           </Binding>
+      </TextBlock.Text>
+  </TextBlock>
+  //方法二
+  <TextBlock Text="{Binding Path=Title, RelativeSource={RelativeSource FindAncestor,            AncestorType={x:Type Window}}}"/>     
+  ```
+
+* DataContext属性
+
+  将大量元素绑定到同一个对象，比如很多TextBlock元素使用类似的绑定表达式提取默认图标字体相关的不同细节，包括行间距，样式，重量等。
+
+  ```c#
+  <Grid>
+      <StackPanel DataContext="{x:Static SystemFonts.IconFontFamily}">
+          <TextBlock Text="{Binding Path=Source}"></TextBlock>
+          <TextBlock Text="{Binding Path=LineSpacing}"></TextBlock>
+          <TextBlock Text="{Binding Path=FamilyTypefaces[0].Style}"></TextBlock>
+      </StackPanel>
+  </Grid>
+  ```
+
+  注意：如果使用了Source属性创建了一个明确标志源的绑定，元素就会使用源而不会使用可能得到的任何数据上下文。
 
 
 ## 3D绘图
